@@ -1,121 +1,485 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+// Root aplikasi & tema utama
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Mood Tracker',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5038BC)),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MoodHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+// Halaman utama Mood Tracker (sesuai desain Figma Home)
+class MoodHomePage extends StatelessWidget {
+  const MoodHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: SafeArea(
+        child: Stack(
           children: [
-            const Text("TesTEsTes"),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            // Konten utama (bisa di-scroll)
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _TopStatusBar(),
+                  const SizedBox(height: 20),
+
+                  // Header sapaan & streak
+                  const _HeaderSection(
+                    nama: 'Zika',
+                    sapaan: 'Halo, Zika 👋',
+                    pertanyaan: 'Bagaimana perasaanmu hari ini?',
+                    streakText: '🔥  5 hari berturut-turut mencatat mood',
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Daftar mood: Hari Ini
+                  const _SectionTitle(judul: 'Hari Ini'),
+                  const SizedBox(height: 8),
+                  const _MoodCard(
+                    judulMood: 'Bersemangat',
+                    jam: '14:20',
+                    catatan: '·  Dapat kabar baik dari klien, semangat banget!',
+                    warnaBadge: Color(0xFFFF7EB6),
+                    assetPath: 'Assets/Pinkmood.svg',
+                  ),
+                  const SizedBox(height: 12),
+                  const _MoodCard(
+                    judulMood: 'Tenang',
+                    jam: '11:00',
+                    catatan: '·  Meditasi pagi terasa menenangkan',
+                    warnaBadge: Color(0xFF4ECDC4),
+                    assetPath: 'Assets/CyanMood.svg',
+                  ),
+                  const SizedBox(height: 12),
+                  const _MoodCard(
+                    judulMood: 'Senang',
+                    jam: '08:30',
+                    catatan: '·  Pagi yang cerah dan menyenangkan',
+                    warnaBadge: Color(0xFFFFC247),
+                    assetPath: 'Assets/OrangeMood.svg',
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Daftar mood: Kemarin
+                  const _SectionTitle(judul: 'Kemarin'),
+                  const SizedBox(height: 8),
+                  const _MoodCard(
+                    judulMood: 'Sedih',
+                    jam: '20:15',
+                    catatan: '·  Kangen rumah tiba-tiba',
+                    warnaBadge: Color(0xFF5B9BF0),
+                    assetPath: 'Assets/BlueMood.svg',
+                  ),
+                  const SizedBox(height: 12),
+                  const _MoodCard(
+                    judulMood: 'Cemas',
+                    jam: '09:00',
+                    catatan: '·  Deadline bikin deg-degan',
+                    warnaBadge: Color(0xFFB49AF2),
+                    assetPath: 'Assets/PurpleMood.svg',
+                  ),
+                ],
+              ),
+            ),
+
+            // Tombol tambah (+) di kanan bawah
+            Positioned(
+              right: 24,
+              bottom: 24,
+              child: _AddMoodButton(
+                onTap: () {
+                  // Aksi saat tombol '+' ditekan
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Tombol tambah mood ditekan!')),
+                  );
+                },
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+// Status bar atas (9:41, sinyal, baterai)
+class _TopStatusBar extends StatelessWidget {
+  const _TopStatusBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 44,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            '9:41',
+            style: TextStyle(
+              color: Color(0xFF111827),
+              fontSize: 15,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            color: Colors.white,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final tinggi in [4.0, 6.0, 8.0, 10.0]) ...[
+                  Container(
+                    width: 2.6,
+                    height: tinggi,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF111827),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                ],
+                Container(
+                  width: 24,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1.3, color: const Color(0xFF111827)),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 17,
+                      height: 7,
+                      margin: const EdgeInsets.only(left: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF111827),
+                        borderRadius: BorderRadius.circular(1.5),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Container(
+                  width: 1.6,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF111827),
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Header sapaan, avatar, dan badge streak
+class _HeaderSection extends StatelessWidget {
+  final String nama;
+  final String sapaan;
+  final String pertanyaan;
+  final String streakText;
+
+  const _HeaderSection({
+    required this.nama,
+    required this.sapaan,
+    required this.pertanyaan,
+    required this.streakText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sapaan,
+                  style: const TextStyle(
+                    color: Color(0xFF111827),
+                    fontSize: 18,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    height: 1.44,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  pertanyaan,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    height: 1.43,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE4DEF7),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                nama.isNotEmpty ? nama[0].toUpperCase() : 'Z',
+                style: const TextStyle(
+                  color: Color(0xFF5038BC),
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE4DEF7),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                streakText,
+                style: const TextStyle(
+                  color: Color(0xFF5038BC),
+                  fontSize: 12,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  height: 1.33,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Judul section ("Hari Ini", "Kemarin")
+class _SectionTitle extends StatelessWidget {
+  final String judul;
+
+  const _SectionTitle({required this.judul});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      judul,
+      style: const TextStyle(
+        color: Color(0xFF111827),
+        fontSize: 15,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+// Komponen card mood yang dipakai berulang
+class _MoodCard extends StatelessWidget {
+  final String judulMood;
+  final String jam;
+  final String catatan;
+  final Color warnaBadge;
+  final String assetPath;
+
+  const _MoodCard({
+    required this.judulMood,
+    required this.jam,
+    required this.catatan,
+    required this.warnaBadge,
+    required this.assetPath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x284F38BC),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _MoodAvatar(warna: warnaBadge, assetPath: assetPath),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  judulMood,
+                  style: const TextStyle(
+                    color: Color(0xFF111827),
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    height: 1.38,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      jam,
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontSize: 11,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        catatan,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontSize: 12,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                          height: 1.50,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                3,
+                (_) => Container(
+                  width: 3.5,
+                  height: 3.5,
+                  margin: const EdgeInsets.symmetric(vertical: 2),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF6B7280),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Ikon mood dari folder Assets/ (sesuaikan SvgPicture.asset jika pakai flutter_svg)
+class _MoodAvatar extends StatelessWidget {
+  final Color warna;
+  final String assetPath;
+
+  const _MoodAvatar({required this.warna, required this.assetPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: warna.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      // Jika kamu memakai package flutter_svg, ganti bagian ini menjadi:
+      // SvgPicture.asset(assetPath, width: 36, height: 36)
+      child: SvgPicture.asset(
+        assetPath,
+        width: 36,
+        height: 36,
+        errorBuilder: (context, error, stackTrace) {
+          return Icon(Icons.sentiment_satisfied_alt, color: warna, size: 24);
+        },
+      ),
+    );
+  }
+}
+
+// Tombol (+) interaktif
+class _AddMoodButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AddMoodButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFF5038BC),
+      shape: const CircleBorder(),
+      elevation: 6,
+      shadowColor: const Color(0x284F38BC),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: const SizedBox(
+          width: 56,
+          height: 56,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
       ),
     );
   }
